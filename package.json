@@ -1,0 +1,23 @@
+{
+  "name": "tootfaver",
+  "version": "1.0.0",
+  "description": "A Mastodon bot that favourites toots from local timeline",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/f-person/tootfaver.git"
+  },
+  "author": "f-person",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/f-person/tootfaver/issues"
+  },
+  "homepage": "https://github.com/f-person/tootfaver#readme",
+  "dependencies": {
+    "request": "^2.88.0",
+    "ws": "^7.2.0"
+  }
+}
