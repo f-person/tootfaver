@@ -30,8 +30,6 @@ var connect = function() {
 	ws.on('message', (msg) => {
 		let message = JSON.parse(msg);
 		let status = JSON.parse(message.payload);
-		console.log(status.id);
-		console.log(status);
 
 		if (message.event == 'update') {
 			if (!status.application.name.toLowerCase().includes("crossposter")) {
