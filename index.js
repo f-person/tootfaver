@@ -2,9 +2,9 @@ const WebSocket = require('ws');
 const request = require("request");
 
 const access_token = process.argv[2];
-var timeout = 500;
+var timeout = 1500;
 
-var favouriteStatus = function(statusId) {
+var favouriteStatus = function (statusId) {
 	request({
 		url: `https://xn--69aa8bzb.xn--y9a3aq/api/v1/statuses/${statusId}/favourite`,
 		method: 'POST',
@@ -20,7 +20,7 @@ var favouriteStatus = function(statusId) {
 	});
 };
 
-var connect = function() {
+var connect = function () {
 	let ws = new WebSocket('wss://xn--69aa8bzb.xn--y9a3aq/api/v1/streaming/?stream=public:local');
 
 	ws.on('close', () => {
