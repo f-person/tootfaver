@@ -22,8 +22,15 @@ var favouriteStatus = function(statusId) {
 
 var connect = function() {
 	let ws = new WebSocket('wss://xn--69aa8bzb.xn--y9a3aq/api/v1/streaming/?stream=public:local');
+	console.log('connected');
 
 	ws.on('close', () => {
+		console.log('disconnected, trying to reconnect');
+		setTimeout(connect, timeout);
+	});
+
+	ws.on('error', () => {
+		console.log('disconnected, trying to reconnect');
 		setTimeout(connect, timeout);
 	});
 
