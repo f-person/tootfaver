@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-	"start": "node index.js $access_token"
+    "start": "node index.js $access_token"
   },
   "repository": {
     "type": "git",
@@ -19,6 +19,7 @@
   "homepage": "https://github.com/f-person/tootfaver#readme",
   "dependencies": {
     "request": "^2.88.0",
+    "simplyws": "^0.1.8",
     "ws": "^7.2.0"
   }
 }

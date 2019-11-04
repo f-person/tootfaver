@@ -1,12 +1,16 @@
-const WebSocket = require('ws');
 const request = require('request');
+const {
+	SimplyWS
+} = require('simplyws');
+const WebSocket = require('ws');
 
+const pod = process.env.pod;
 const access_token = process.env.access_token;
-var timeout = 1500;
+const timeout = 6000;
 
-var favouriteStatus = function(statusId) {
+const favouriteStatus = (statusId) => {
 	request({
-		url: `https://xn--69aa8bzb.xn--y9a3aq/api/v1/statuses/${statusId}/favourite`,
+		url: `https://${pod}/api/v1/statuses/${statusId}/favourite`,
 		method: 'POST',
 		headers: {
 			'Authorization': `Bearer ${access_token}`
@@ -14,7 +18,7 @@ var favouriteStatus = function(statusId) {
 	}, (error, response, body) => {
 		console.log(`${statusId} favourite response: ${body} \n`);
 
-		if ((error || response.statusCode != 200) && response.statusCode != 401) {
+		if (error || response.statusCode != 200) {
 			setTimeout(() => {
 				favouriteStatus(statusId);
 			}, timeout);
@@ -22,23 +26,51 @@ var favouriteStatus = function(statusId) {
 	});
 };
 
-var connect = function() {
-	let ws = new WebSocket(`wss://xn--69aa8bzb.xn--y9a3aq/api/v1/streaming/?stream=public:local&access_token=${access_token}`);
-	console.log('connected');
-
-	ws.on('close', () => {
-		console.log('close: disconnected, trying to reconnect');
-		setTimeout(connect, timeout);
-	});
-
-	ws.on('error', (msg) => {
-		console.log('error: disconnected, trying to reconnect:', msg);
-		if (!msg.includes("401")) {
-			setTimeout(connect, timeout);
+const favouriteLatestToots = () => {
+	request({
+		url: `https://${pod}/api/v1/timelines/public?local=true&access_token=${access_token}`,
+		method: 'GET',
+	}, (error, response, body) => {
+		if (error || response.statusCode != 200) {
+			setTimeout(() => {
+				favouriteLatestToots();
+			}, timeout);
+		} else {
+			let responseData = JSON.parse(body);
+			responseData.forEach((status) => {
+				if (!status.favourited) {
+					favouriteStatus(status.id);
+				}
+			});
 		}
 	});
+}
 
-	ws.on('message', (msg) => {
+const connect = () => {
+	favouriteLatestToots();
+
+	let ws = new WebSocket(`wss://${pod}/api/v1/streaming/?stream=public:local&access_token=${access_token}`);
+	let simplyWS = new SimplyWS({
+		socket: ws,
+		autoConnects: true
+	})
+
+	simplyWS.on('open', () => {
+		console.log('connected');
+	});
+
+	simplyWS.on('close', () => {
+		console.log('closed');
+		connect();
+	});
+
+	simplyWS.on('error', (error) => {
+		console.log('error:', error);
+		simplyWS.close();
+		connect();
+	});
+
+	simplyWS.on('message', (msg) => {
 		let message = JSON.parse(msg);
 		let status = JSON.parse(message.payload);
 
