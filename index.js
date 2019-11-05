@@ -38,7 +38,7 @@ const favouriteLatestToots = () => {
 		} else {
 			let responseData = JSON.parse(body);
 			responseData.forEach((status) => {
-				if (!status.favourited) {
+				if (!status.favourited && !status.application.name.toLowerCase().includes('crossposter')) {
 					favouriteStatus(status.id);
 				}
 			});
