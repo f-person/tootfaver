@@ -7,6 +7,7 @@ const WebSocket = require('ws');
 const pod = process.env.pod;
 const access_token = process.env.access_token;
 const timeout = 6000;
+const reconnectInterval = 1000;
 
 const favouriteStatus = (statusId) => {
 	request({
@@ -46,14 +47,16 @@ const favouriteLatestToots = () => {
 	});
 }
 
+var ws, simplyWS;
+
 const connect = () => {
 	favouriteLatestToots();
 
-	let ws = new WebSocket(`wss://${pod}/api/v1/streaming/?stream=public:local&access_token=${access_token}`);
-	let simplyWS = new SimplyWS({
+	ws = new WebSocket(`wss://${pod}/api/v1/streaming/?stream=public:local&access_token=${access_token}`);
+	simplyWS = new SimplyWS({
 		socket: ws,
 		autoConnects: true
-	})
+	});
 
 	simplyWS.on('open', () => {
 		console.log('connected');
@@ -61,13 +64,10 @@ const connect = () => {
 
 	simplyWS.on('close', () => {
 		console.log('closed');
-		connect();
 	});
 
 	simplyWS.on('error', (error) => {
 		console.log('error:', error);
-		simplyWS.close();
-		connect();
 	});
 
 	simplyWS.on('message', (msg) => {
@@ -84,3 +84,7 @@ const connect = () => {
 };
 
 connect();
+setInterval(() => {
+	simplyWS.close();
+	connect();
+}, reconnectInterval);
