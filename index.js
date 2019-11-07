@@ -7,7 +7,7 @@ const WebSocket = require('ws');
 const pod = process.env.pod;
 const access_token = process.env.access_token;
 const timeout = 6000;
-const reconnectInterval = 1000;
+const reconnectInterval = 600000;
 
 const favouriteStatus = (statusId) => {
 	request({
